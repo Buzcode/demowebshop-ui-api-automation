@@ -1,0 +1,98 @@
+{
+  "info": {
+    "_postman_id": "8213d738-aadf-4962-95fe-292bfa750f6a",
+    "name": "JSONPlaceholder Users API",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+    "_exporter_id": "36773973",
+    "_collection_link": "https://go.postman.co/collection/36773973-8213d738-aadf-4962-95fe-292bfa750f6a?source=collection_link"
+  },
+  "item": [
+    {
+      "name": "Get All Users",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "const responseData = pm.response.json();\r\n\r\n// 1. Status code should be 200\r\npm.test(\"Status code is 200\", function () {\r\n    pm.response.to.have.status(200);\r\n});\r\n\r\n// 2. Response should be a non-empty array\r\npm.test(\"Response is a non-empty array\", function () {\r\n    pm.expect(responseData).to.be.an(\"array\").that.is.not.empty;\r\n});\r\n\r\n// 3. Each user should have id, name, and email\r\npm.test(\"Each user contains id, name, and email\", function () {\r\n    responseData.forEach((user) => {\r\n        pm.expect(user).to.have.property(\"id\");\r\n        pm.expect(user).to.have.property(\"name\").that.is.a(\"string\").and.not.empty;\r\n        pm.expect(user).to.have.property(\"email\").that.is.a(\"string\").and.not.empty;\r\n    });\r\n});\r\n\r\n// 4. Select any one user's ID and save it in a local variable\r\nconst selectedUser = responseData[0]; // or random index\r\npm.collectionVariables.set(\"id\", selectedUser.id);"
+            ]
+          }
+        }
+      ],
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": {
+          "raw": "https://jsonplaceholder.typicode.com/users",
+          "protocol": "https",
+          "host": [
+            "jsonplaceholder",
+            "typicode",
+            "com"
+          ],
+          "path": [
+            "users"
+          ]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "Update User",
+      "event": [
+        {
+          "listen": "prerequest",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.variables.set(\"updatedName\", pm.variables.replaceIn(\"{{$randomFullName}}\"));\r\npm.variables.set(\"updatedEmail\", pm.variables.replaceIn(\"{{$randomEmail}}\"));\r\npm.variables.set(\"updatedCompany\", pm.variables.replaceIn(\"{{$randomCompanyName}}\"));"
+            ]
+          }
+        },
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "const responseData = pm.response.json();\r\nconst expectedId = Number(pm.variables.get(\"id\"));\r\nconst expectedName = pm.variables.get(\"updatedName\");\r\n\r\n// 1. Status code should be 200 (mandatory on every request)\r\npm.test(\"Status code is 200\", function () {\r\n    pm.response.to.have.status(200);\r\n});\r\n\r\n// 2. Returned ID should match the ID stored in the variable\r\npm.test(\"Returned ID matches stored ID\", function () {\r\n    pm.expect(responseData.id).to.eql(expectedId);\r\n});\r\n\r\n// 3. Phone should not be empty\r\npm.test(\"Phone should not be empty\", function () {\r\n    pm.expect(responseData.phone).to.be.a(\"string\").and.not.be.empty;\r\n});\r\n\r\n// 4. Returned name should match the updated name\r\npm.test(\"Returned name matches updated name\", function () {\r\n    pm.expect(responseData.name).to.eql(expectedName);\r\n});"
+            ]
+          }
+        }
+      ],
+      "request": {
+        "method": "PATCH",
+        "header": [],
+        "body": {
+          "mode": "raw",
+          "raw": "{\r\n  \"name\": \"{{updatedName}}\",\r\n  \"email\": \"{{updatedEmail}}\",\r\n  \"company\": {\r\n    \"name\": \"{{updatedCompany}}\"\r\n  }\r\n}",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        },
+        "url": {
+          "raw": "https://jsonplaceholder.typicode.com/users/{{id}}",
+          "protocol": "https",
+          "host": [
+            "jsonplaceholder",
+            "typicode",
+            "com"
+          ],
+          "path": [
+            "users",
+            "{{id}}"
+          ]
+        }
+      },
+      "response": []
+    }
+  ],
+  "variable": [
+    {
+      "key": "id",
+      "value": ""
+    }
+  ]
+}

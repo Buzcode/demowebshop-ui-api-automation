@@ -1,32 +1,37 @@
 # Demo Web Shop UI & API Automation
 
 ## Project Overview
-Automated UI testing for Demo Web Shop (https://demowebshop.tricentis.com/) using Playwright with Page Object Model (POM), and API testing for JSONPlaceholder Users API using Postman & Newman.
+Automated UI testing for **Demo Web Shop** (https://demowebshop.tricentis.com/) using **Playwright** with **Page Object Model (POM)**, and API testing for **JSONPlaceholder Users API** using **Postman & Newman**.
 
 ## Tech Stack
-- **UI Automation:** Playwright (JavaScript / Node.js) with Page Object Model (POM)
+- **UI Automation:** Playwright (JavaScript / Node.js, ES Modules) with Page Object Model (POM)
 - **API Automation:** Postman & Newman CLI
-- **Reporting:** Playwright HTML Report, Allure Report, Newman HTML/CLI Report
+- **Reporting:** Playwright HTML Report, Allure Report (`allure-playwright`, `allure-commandline`), Newman HTML/CLI Report
+- **Configuration:** `dotenv`
 - **Version Control:** Git & GitHub
 
 ## Prerequisites
 - Node.js (v18+ recommended)
-- Java (required to generate/open Allure reports)
-- Newman & `newman-reporter-html` installed globally (`npm install -g newman newman-reporter-html`)
+- Java JDK (required to generate/open Allure reports)
+- Newman & `newman-reporter-html` installed globally:
+  ```bash
+  npm install -g newman newman-reporter-html
+  ```
 
 ## Project Structure
-- `pages/` — Page Object Model classes
-- `tests/` — UI test scenarios (Q1, Q2, Q3)
-- `api-tests/` — Postman collection JSON for API tests
-- `playwright.config.js` — Playwright & reporter configuration
+- `pages/` — Page Object Model classes (`BasePage.js`, `LoginPage.js`, `RegisterPage.js`, `ProductPage.js`, `CartPage.js`, `SearchPage.js`, `CheckoutPage.js`)
+- `tests/` — UI test scenarios (`q1_invalid_login.spec.js`, `q2_register_cart.spec.js`, `q3_e2e_checkout.spec.js`)
+- `api-tests/` — Postman collection JSON (`jsonplaceholder-users.postman_collection.json`)
+- `playwright.config.js` — Playwright sequential execution & HTML/Allure reporter configuration
+- `package.json` — Scripts for individual, sequential, and combined test execution
 
 ## Setup Instructions
 1. Clone the repository:
    ```bash
-   git clone <your-repo-url>
-   cd <your-repo-folder>
+   git clone https://github.com/Buzcode/demowebshop-ui-api-automation.git
+   cd demowebshop-ui-api-automation
    ```
-2. Install dependencies:
+2. Install dependencies and Playwright Chromium:
    ```bash
    npm install
    npx playwright install chromium
@@ -36,40 +41,51 @@ Automated UI testing for Demo Web Shop (https://demowebshop.tricentis.com/) usin
    BASE_URL=https://demowebshop.tricentis.com/
    ```
 
-## Running UI Tests
+## Running Tests
+
 ### Run Each Scenario Individually
 - **Q1 (Invalid Login):**
   ```bash
-  npx playwright test tests/<your-q1-file>
+  npm run test:q1
   ```
-- **Q2 (Register + Add to Cart):**
+- **Q2 (Register, Login & Add to Cart):**
   ```bash
-  npx playwright test tests/<your-q2-file>
+  npm run test:q2
   ```
-- **Q3 (E2E Search to Checkout):**
+- **Q3 (E2E Product Search to Order Checkout):**
   ```bash
-  npx playwright test tests/<your-q3-file>
+  npm run test:q3
+  ```
+- **Part C (API Tests via Newman + HTML Report):**
+  ```bash
+  npm run test:api
   ```
 
-### Run All UI Scenarios Sequentially
-```bash
-npx playwright test
-```
-*(Update this if you add custom `npm run` scripts in `package.json`.)*
+### Run All Scenarios Sequentially
+- **All UI scenarios sequentially (`workers: 1`):**
+  ```bash
+  npm run test:ui
+  ```
+- **All UI + API scenarios sequentially + generate Allure report:**
+  ```bash
+  npm run test:all
+  ```
 
 ## Generating & Viewing Reports
-### Playwright HTML Report
+
+### Playwright HTML Report (includes attached screenshots)
 ```bash
-npx playwright show-report
+npm run report:html
 ```
 
-### Allure Report
+### Allure Report (includes test steps & attached screenshots)
 ```bash
-npx allure generate allure-results --clean -o allure-report
-npx allure open allure-report
+npm run report:allure:generate
+npm run report:allure:open
 ```
 
-## Running API Tests (Postman / Newman)
+### Newman API HTML Report
+Generated automatically at `reports/newman-report.html` when running `npm run test:api` or `npm run test:all` (or directly via):
 ```bash
-newman run api-tests/<your-collection-file>.json -r cli,html --reporter-html-export api-tests/report.html
+newman run api-tests/jsonplaceholder-users.postman_collection.json -r "cli,html" --reporter-html-export reports/newman-report.html
 ```
